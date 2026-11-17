@@ -1,9 +1,9 @@
 diff --git a/libavcodec/allcodecs.c b/libavcodec/allcodecs.c
-index e593ad1..f074ac8 100644
+index 5136a56..c7d9f01 100644
 --- a/libavcodec/allcodecs.c
 +++ b/libavcodec/allcodecs.c
-@@ -884,6 +884,7 @@ extern const FFCodec ff_vp9_cuvid_decoder;
- extern const FFCodec ff_vp9_mediacodec_decoder;
+@@ -895,6 +895,7 @@ extern const FFCodec ff_vp9_mediacodec_decoder;
+ extern const FFCodec ff_vp9_mediacodec_encoder;
  extern const FFCodec ff_vp9_qsv_decoder;
  extern const FFCodec ff_vp9_vaapi_encoder;
 +extern const FFCodec ff_vp9_videotoolbox_decoder;
@@ -11,10 +11,10 @@ index e593ad1..f074ac8 100644
  
  // null codecs
 diff --git a/libavcodec/vp9.c b/libavcodec/vp9.c
-index 7c0a246..2abd3d3 100644
+index 17fc6b8..8bbd5d3 100644
 --- a/libavcodec/vp9.c
 +++ b/libavcodec/vp9.c
-@@ -1906,6 +1906,35 @@ const FFCodec ff_vp9_decoder = {
+@@ -1924,6 +1924,35 @@ const FFCodec ff_vp9_decoder = {
  #if CONFIG_VP9_VDPAU_HWACCEL
                                 HWACCEL_VDPAU(vp9),
  #endif
