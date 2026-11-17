@@ -27,7 +27,10 @@ let
     chmod -R 777 $src
 
     cd $src
-    patch -p1 <${../../../patches/ltmain-target-passthrough.patch}
+    # libtool passes -target to the linker (ltmain-target-passthrough.patch,
+    # done with sed so it fits libtool 2.4 and 2.5, whose line ends in |-q)
+    sed -i -E 's/^(      -model\|-arch\|-isysroot\|--sysroot)(\|-q)?\)/\1\2|-target)/' ltmain.sh
+    grep -q -- '--sysroot.*|-target)' ltmain.sh
     cd -
 
     cp ${./meson.build} $src/meson.build
