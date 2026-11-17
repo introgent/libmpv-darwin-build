@@ -14,7 +14,10 @@ jobs:
   ci:
     name: ci
     # https://github.com/actions/runner-images/blob/main/images/macos/macos-15-arm64-Readme.md
-    runs-on: macos-15
+    # Intel: GitHub's Apple-silicon runners were too busy to start a job on
+    # 17 Nov 2026 (queued 15 minutes, then dropped, twice). The build
+    # cross-compiles both architectures either way.
+    runs-on: macos-15-intel
     permissions:
       contents: write
     steps:
@@ -47,7 +50,10 @@ jobs:
       - name: Xcode path
         id: xcode_path
         run: |
-          XCODE_PATH=$(realpath /Applications/Xcode_16.1.0.app)
+          XCODE_PATH=$(realpath /Applications/Xcode_16.1.0.app 2>/dev/null || true)
+          if [ -z "$XCODE_PATH" ]; then
+            XCODE_PATH=$(ls -d /Applications/Xcode_16.*.app | sort -V | head -1)
+          fi
 
           ${XCODE_PATH}/Contents/Developer/usr/bin/xcodebuild -version
 
