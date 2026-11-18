@@ -53,6 +53,23 @@ let
 
     cp -r $src $out
   '';
+
+  # FFmpeg 6.1.6's VideoToolbox scaler (iOS 16) and encoders (iOS 11,
+  # macOS 10.13) don't build for the iOS 9 and macOS 10.9 these target
+  # (-Werror=partial-availability), so the video encodersgpl flavor, the only
+  # one to enable all filters and encoders, goes without them. Done here, on a
+  # copy of the source with the same name, rather than in meson.build, so the
+  # other flavors' builds stay exactly as they were.
+  withoutVideoToolboxEncoders =
+    pkgs.lib.optionalString (variant == variants.video && flavor == flavors.encodersgpl)
+      ''
+        mkdir encodersgpl
+        cp -r $src encodersgpl/
+        src=$PWD/encodersgpl/$(basename $src)
+        chmod -R u+w $src
+        sed -i.orig "s|'--enable-libx264',|'--enable-libx264', '--disable-filter=scale_vt', '--disable-encoder=h264_videotoolbox', '--disable-encoder=hevc_videotoolbox', '--disable-encoder=prores_videotoolbox',|" $src/meson.build
+        grep -q "disable-filter=scale_vt" $src/meson.build
+      '';
 in
 
 pkgs.stdenvNoCC.mkDerivation {
@@ -80,7 +97,7 @@ pkgs.stdenvNoCC.mkDerivation {
       libvpx
       libx264
     ];
-  configurePhase = ''
+  configurePhase = withoutVideoToolboxEncoders + ''
     meson setup build $src \
       --native-file ${nativeFile} \
       --cross-file ${crossFile} \
